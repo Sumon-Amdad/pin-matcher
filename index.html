@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pin Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="pin-generator half-width">
+                    <input class="form-control" id="show-pin" type="text">
+                    <button class="generate-btn" id="generate-btn">Generate Pin</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-section half-width">
+                    <input class="form-control" id="user-input-pin" type="text">
+                    <div class="numbers">
+                        <div class="calc-body">
+                            <div class="calc-button-row">
+                              <div class="button">7</div>
+                              <div class="button">8</div>
+                              <div class="button">9</div>
+                            </div>
+                            <div class="calc-button-row">
+                              <div class="button">4</div>
+                              <div class="button">5</div>
+                              <div class="button">6</div>
+                            </div>
+                            <div class="calc-button-row">
+                              <div class="button">1</div>
+                              <div class="button">2</div>
+                              <div class="button">3</div>
+                            </div>
+                            <div class="calc-button-row">
+                                <div class="button" data-type="backSpace"><</div>
+                                <div class="button">0</div>
+                                <div class="button" data-type="clear">Clear</div>
+                            </div>
+                            <div>
+                                <button type="submit" class="submit-btn" id="submit-btn">Submit</button>
+                                <p class="action-left"><span id="numOfTry">3</span> try left</p>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="notify-section">
+            <p class="notify" id="notify-wrong">❌ Pin Didn't Match, Please try again</p>
+            <p class="notify" id="notity-success">✅ Pin Matched... Secret door is opening for you</p>
+        </div>
+    </div>
+
+    <script>
+        // variable name
+const wrongNotify = document.getElementById('notify-wrong');
+const successNotify = document.getElementById('notity-success');
+
+const numberKeyPad = document.querySelector('.numbers');
+let userInput = document.getElementById('user-input-pin');
+
+const submitBtn = document.getElementById('submit-btn');
+
+let tryLeft = document.getElementById('numOfTry');
+let totalTry = 3;
+
+// Hide Section
+function hideSection() {
+  wrongNotify.style.display = 'none';
+  successNotify.style.display = 'none';
+}
+hideSection();
+
+// Random digit generate section
+const generateBtn = document.getElementById('generate-btn');
+const generatedPin = document.getElementById('show-pin');
+
+generateBtn.addEventListener('click', function () {
+  generatedPin.value = randomNumber(1000, 9999);
+  submitBtn.disabled = false;
+  resetNumber();
+});
+
+function randomNumber(minNum, maxNum) {
+  return Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+}
+
+// Key pad part
+numberKeyPad.addEventListener('click', function (e) {
+  hideSection();
+  let targetKey = e.target;
+  keyInputNumber(targetKey);
+});
+
+function keyInputNumber(targetKey) {
+  if (targetKey.classList.contains('button')) {
+    // clear button
+    if (targetKey.dataset.type == 'clear') {
+      userInput.value = '';
+    }
+    // backspace button
+    else if (targetKey.dataset.type == 'backSpace') {
+      let inputString = userInput.value;
+      userInput.value = inputString.slice(0, inputString.length - 1);
+    }
+    // reset number
+    else {
+      const newDigit = targetKey.innerHTML;
+      userInput.value += newDigit;
+    }
+  }
+
+  if (
+    targetKey.classList.contains('submit-btn') &&
+    generatedPin.value.length > 0
+  ) {
+    userInputNumber();
+  }
+}
+
+function userInputNumber() {
+  if (userInput.value == generatedPin.value) {
+    successNotify.style.display = 'block';
+  }
+  // not matching number
+  else {
+    wrongNotify.style.display = 'block';
+    totalTry--;
+    tryLeft.innerText = totalTry;
+
+    if (totalTry == 0) {
+      submitBtn.disabled = true;
+      submitBtn.style.backgroundColor = '#3d4153';
+    }
+  }
+}
+
+// try left
+function resetNumber() {
+  totalTry = 3;
+  tryLeft.innerText = totalTry;
+  userInput.value = '';
+  hideSection();
+}
+    </script>
+</body>
+</html>
